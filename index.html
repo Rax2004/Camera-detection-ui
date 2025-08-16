@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Station 13 – Webcam Stream</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      #container {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.6);
+      }
+
+      #videoElement {
+        width: 500px;
+        height: 375px;
+        border-radius: 15px;
+        background-color: #000;
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.5);
+      }
+
+      .btn-group {
+        margin-top: 15px;
+      }
+
+      button {
+        background: #e94560;
+        border: none;
+        padding: 10px 18px;
+        margin: 5px;
+        border-radius: 8px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background: #ff2e63;
+      }
+
+      #snapshot {
+        margin-top: 15px;
+      }
+
+      canvas {
+        margin-top: 10px;
+        border-radius: 10px;
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.4);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="container">
+      <h2>📹 Live Webcam – Station 13</h2>
+      <video autoplay="true" id="videoElement"></video>
+
+      <div class="btn-group">
+        <button id="startBtn">Start Camera</button>
+        <button id="stopBtn">Stop Camera</button>
+        <button id="snapBtn">Take Snapshot</button>
+        <button id="downloadBtn">Download Snapshot</button>
+      </div>
+
+      <div id="snapshot">
+        <h3>📷 Snapshot Preview</h3>
+        <canvas id="canvas" width="500" height="375"></canvas>
+      </div>
+    </div>
+
+    <script>
+      const video = document.querySelector("#videoElement");
+      const startBtn = document.getElementById("startBtn");
+      const stopBtn = document.getElementById("stopBtn");
+      const snapBtn = document.getElementById("snapBtn");
+      const downloadBtn = document.getElementById("downloadBtn");
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      let stream;
+
+      // Start Camera
+      startBtn.onclick = async () => {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          video.srcObject = stream;
+        } catch (err) {
+          alert("Camera access denied!");
+        }
+      };
+
+      // Stop Camera
+      stopBtn.onclick = () => {
+        if (stream) {
+          let tracks = stream.getTracks();
+          tracks.forEach((track) => track.stop());
+          video.srcObject = null;
+        }
+      };
+
+      // Take Snapshot
+      snapBtn.onclick = () => {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      };
+
+      // Download Snapshot
+      downloadBtn.onclick = () => {
+        const link = document.createElement("a");
+        link.download = "snapshot.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      };
+    </script>
+  </body>
+</html>
